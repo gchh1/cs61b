@@ -3,7 +3,7 @@ package timingtest;
 import edu.princeton.cs.algs4.Stopwatch;
 
 /**
- * Created by hug.
+ * Created by hug
  */
 public class StopwatchDemo {
     /** Computes the nth Fibonacci number using a slow naive recursive strategy.*/
