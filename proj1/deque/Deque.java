@@ -2,12 +2,12 @@ package deque;
 
 import java.util.Iterator;
 
-public interface Deque<Type> {
-    /* Add an item of type Type to the front of the deque */
-    public void addFirst(Type item);
+public interface Deque<T> {
+    /* Add an item of T T to the front of the deque */
+    public void addFirst(T item);
 
-    /* Add an item of type Type to the back of the deque */
-    public void addLast(Type item);
+    /* Add an item of T T to the back of the deque */
+    public void addLast(T item);
 
     /* Return true if deque if empty, false otherwise */
     default boolean isEmpty() {
@@ -21,11 +21,11 @@ public interface Deque<Type> {
     public void printDeque();
 
     /* Remove and return the item at the front of the deque. Return null when no such item */
-    public Type removeFirst();
+    public T removeFirst();
 
     /* Remove and return the item at the back of the deque. Return null when no such item */
-    public Type removeLast();
+    public T removeLast();
 
     /* Get the item at the given index. Return null when no such item */
-    public Type get(int index);
+    public T get(int index);
 }
