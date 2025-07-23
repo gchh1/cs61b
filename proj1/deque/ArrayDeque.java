@@ -100,7 +100,7 @@ public class ArrayDeque<Type> implements Deque<Type>, Iterable<Type> {
         if (size == 0 || index >= size) {
             return null;
         }
-        return items[getValidIndex(nextFirst - 1 + index)];
+        return items[getValidIndex(nextFirst + 1 + index)];
     }
 
     @Override
