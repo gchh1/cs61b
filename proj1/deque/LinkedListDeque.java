@@ -1,7 +1,7 @@
 package deque;
 
 import java.util.Iterator;
-import java.util.concurrent.DelayQueue;
+import java.util.Objects;
 
 public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private class listNode {
@@ -142,15 +142,21 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Deque<?>)) return false;
-        if (size != ((Deque<?>)o).size()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Deque<?>)) {
+            return false;
+        }
+        if (size != ((Deque<?>)o).size()) {
+            return false;
+        }
 
         int index = size - 1;
         boolean flag = true;
 
         while (index >= 0) {
-            if (this.get(index) != ((Deque<?>)o).get(index)) {
+            if (!Objects.equals(this.get(index), ((Deque<?>)o).get(index))) {
                 flag = false;
             }
             index -= 1;

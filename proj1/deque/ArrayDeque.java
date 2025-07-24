@@ -1,14 +1,14 @@
 package deque;
 
 import java.util.Iterator;
-import java.util.StringJoiner;
+import java.util.Objects;
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
-    protected T[] items;
-    protected int size;
-    protected int capacity;
-    protected int nextFirst;
-    protected int nextLast;
+    private T[] items;
+    private int size;
+    private int capacity;
+    private int nextFirst;
+    private int nextLast;
 
     public ArrayDeque() {
         size = 0;
@@ -34,7 +34,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         nextLast = i;
     }
 
-    protected int getValidIndex(int index) {
+    private int getValidIndex(int index) {
         if (index < 0) {
             return Math.abs(capacity + index);
         }
@@ -139,13 +139,19 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Deque<?>)) return false;
-        if (size != ((Deque<?>)o).size()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Deque<?>)) {
+            return false;
+        }
+        if (size != ((Deque<?>)o).size()) {
+            return false;
+        }
 
         boolean flag = true;
         for (int i = 0; i < size; i++) {
-            if (this.get(i) != ((Deque<?>)o).get(i)) {
+            if (!Objects.equals(this.get(i), ((Deque<?>)o).get(i))) {
                 flag = false;
             }
         }
