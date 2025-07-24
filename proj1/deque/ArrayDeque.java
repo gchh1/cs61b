@@ -116,19 +116,22 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         System.out.println(output);
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             private int index = getValidIndex(nextFirst + 1);
+            private int count = 0;
 
             @Override
             public boolean hasNext() {
-                return size != 0;
+                return count < size;
             }
 
             @Override
             public T next() {
                 T val = items[index];
                 index = getValidIndex(index + 1);
+                count++;
                 return val;
             }
         };

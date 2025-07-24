@@ -2,6 +2,9 @@ package deque;
 
 import edu.princeton.cs.algs4.StdRandom;
 import org.junit.Test;
+
+import java.util.Iterator;
+
 import static org.junit.Assert.*;
 
 
@@ -163,6 +166,23 @@ public class ArrayListDequeTest {
                 int index = StdRandom.uniform(0, lld1.size());
                 assertEquals(lld1.get(index), lld2.get(index));
             }
+        }
+    }
+
+    @Test
+    public void iteratorTest() {
+        ArrayDeque<Integer> test = new ArrayDeque<>();
+
+        int N = 100000;
+        for (int i = 0; i < N; i++) {
+            test.addFirst(i);
+        }
+
+        Iterator<Integer> it = test.iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            System.out.println(it.next());
+            i++;
         }
     }
 }
