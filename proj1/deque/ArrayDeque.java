@@ -20,7 +20,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     private void resize(int capacity) {
         T[] temp = (T[]) new Object[capacity];
-
         int index = getValidIndex(nextFirst + 1);
         int i = 0;
         for (; i < size; i++) {
