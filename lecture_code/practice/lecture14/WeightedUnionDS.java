@@ -21,11 +21,11 @@ public class WeightedUnionDS implements DisjointSets {
         int i = find(p);
         int j = find(q);
         if (parent[i] >= parent[j]) {
-            parent[p] = j;
             parent[j] += parent[i];
+            parent[i] = j;
         } else {
-           parent[q] = i;
-           parent[i] += parent[j];
+            parent[i] += parent[j];
+            parent[j] = i;
         }
     }
 
@@ -40,6 +40,8 @@ public class WeightedUnionDS implements DisjointSets {
         ds.connect(0, 1);
         ds.connect(3, 1);
         ds.connect(6, 1);
+        ds.connect(2, 4);
+        ds.connect(2, 1);
         System.out.println(ds.connected(0, 6));
     }
 }
