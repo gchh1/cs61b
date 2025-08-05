@@ -2,7 +2,7 @@ package bstmap;
 
 import java.util.*;
 
-public class BSTMap<K extends Comparable, V> implements Map61B<K, V> {
+public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     /** Represents one basic node in the binary search tree
      *  that stores the key-value pairs
