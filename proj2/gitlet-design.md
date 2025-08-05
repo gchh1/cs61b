@@ -1,6 +1,6 @@
 # Gitlet Design Document
 
-**Name**:
+**Name**: **yhc**
 
 ## Classes and Data Structures
 

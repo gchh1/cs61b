@@ -1,7 +1,9 @@
-public class QuickUnionDS implements DisjointSets {
+package DisjointSets;
+
+public class WeightedUnionDS implements DisjointSets {
     private int[] parent;
 
-    public QuickUnionDS(int n) {
+    public WeightedUnionDS(int n) {
         parent = new int[n];
         for (int i = 0; i < n; i++) {
             parent[i] = -1;
@@ -20,20 +22,19 @@ public class QuickUnionDS implements DisjointSets {
     public void connect(int p, int q) {
         int i = find(p);
         int j = find(q);
-        parent[p] = j;
+        if (parent[i] >= parent[j]) {
+            parent[j] += parent[i];
+            parent[i] = j;
+        } else {
+            parent[i] += parent[j];
+            parent[j] = i;
+        }
     }
 
     @Override
-    public boolean connected(int p, int q) {
+    public boolean isConnected(int p, int q) {
         return find(p) == find(q);
     }
 
-    public static void main(String[] args) {
-        QuickUnionDS ds = new QuickUnionDS(7);
-        
-        ds.connect(0, 1);
-        ds.connect(3, 1);
-        ds.connect(6, 1);
-        System.out.println(ds.connected(0, 6));
-    }
+
 }

@@ -1,3 +1,4 @@
+package DisjointSets;
 
 public class QuickFindDS implements DisjointSets {
     private int[] id;
@@ -22,15 +23,9 @@ public class QuickFindDS implements DisjointSets {
     }
 
     @Override
-    public boolean connected(int p, int q) {
+    public boolean isConnected(int p, int q) {
         return id[p] == id[q];
     }
 
-    public static void main(String[] args) {
-        QuickFindDS ds = new QuickFindDS(7);
-        ds.connect(0, 1);
-        ds.connect(3, 1);
-        ds.connect(6, 1);
-        System.out.println(ds.connected(0, 6));
-    }
+
 }
