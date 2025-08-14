@@ -110,6 +110,10 @@ public class Repository {
     /** Get the Commit through sha1 id */
     public static Commit getCommit(String id) {
         File commitFile = Utils.join(objects, id);
+        if (!commitFile.exists()) {
+            System.out.println(Failure.COMMIT_NOT_EXIST);
+            System.exit(0);
+        }
         return Utils.readObject(commitFile, Commit.class);
     }
 

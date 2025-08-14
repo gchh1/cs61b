@@ -278,10 +278,6 @@ public class Command {
             The new version of the file is not staged.
              */
             Commit curr = Repository.getCommit(args[1]);
-            if (curr == null) {
-                System.out.println(Failure.COMMIT_NOT_EXIST);
-                System.exit(0);
-            }
             Failure.checkFileExitInCommit(args[3], curr);
             Repository.checkoutFile(args[3], curr);
 
@@ -332,7 +328,7 @@ public class Command {
             System.out.println(Failure.CANNOT_RM_CURRENT_BRANCH);
             System.exit(0);
         }
-        if (!Repository.getCurrentBranch().contains(branchName)) {
+        if (!Repository.getBranches().contains(branchName)) {
             System.out.println(Failure.BRANCH_NAME_NOT_EXIST);
             System.exit(0);
         }
