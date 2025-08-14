@@ -273,7 +273,7 @@ public class Repository {
             headContent = new String(Utils.readObject(Utils.join(objects, headID), Blob.class).getContent());
         }
         if (givenID != null) {
-            givenContent = new String(Utils.readObject(Utils.join(objects, givenID), Blob.class).getContent().toString());
+            givenContent = new String(Utils.readObject(Utils.join(objects, givenID), Blob.class).getContent());
         }
 
         String conflictContent =
