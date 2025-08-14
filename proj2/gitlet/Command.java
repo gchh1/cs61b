@@ -33,7 +33,7 @@ public class Command {
         // Add the file into objects folder
         Repository.saveObject(blob);
 
-        Stage stage = new Stage();
+        Stage stage = Repository.readStage();
 
         // Judge whether the content of the file named filename is modified,
         // do not stage it, meaning that remove the file from both addition and removal
@@ -135,7 +135,7 @@ public class Command {
             }
         }
         // Print 2 line breaks
-        System.out.print("\n\n");
+        System.out.print("\n");
 
         // Step2: Print the staged files
         System.out.println("=== Staged Files ===");
@@ -143,11 +143,8 @@ public class Command {
         for (String key : stage.getAddition().keySet()) {
             System.out.println(key);
         }
-        if (stage.getAddition().isEmpty()) {
-            System.out.print("\n");
-        } else {
-            System.out.print("\n\n");
-        }
+        System.out.print("\n");
+
 
         // Step3: Print the removed files
         System.out.println("=== Removed Files ===");
@@ -155,11 +152,8 @@ public class Command {
             System.out.println(key);
         }
 
-        if (stage.getRemoval().isEmpty()) {
-            System.out.print("\n");
-        } else {
-            System.out.print("\n\n");
-        }
+        System.out.print("\n");
+
 
         // Step4: Print modifications not staged for commit
         System.out.println("=== Modifications Not Staged For Commit ===");
@@ -216,25 +210,17 @@ public class Command {
         for (Map.Entry<String, String> entry : modifiedFiles.entrySet()) {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
-        if (!modifiedFiles.isEmpty()) {
-            System.out.print("\n\n");
-        } else {
-            System.out.print("\n");
-        }
+
+
+        System.out.print("\n");
 
         // Step5: Print untracked files
         System.out.println("=== Untracked Files ===");
 
 
         // Print 2 line breaks
-        for (String s : untrackedFiles) {
-            System.out.println(s);
-        }
-        if (!untrackedFiles.isEmpty()) {
-            System.out.print("\n\n");
-        } else {
-            System.out.print("\n");
-        }
+
+        System.out.print("\n");
     }
 
     /** find command
