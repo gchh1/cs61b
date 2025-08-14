@@ -281,7 +281,7 @@ public class Repository {
                         headContent +
                         "\n=======\n" +
                         givenContent +
-                        "\n>>>>>>>\n";
+                        "\n>>>>>>>";
 
         Utils.writeContents(new File(filename), conflictContent);
     }
