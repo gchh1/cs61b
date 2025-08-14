@@ -270,10 +270,10 @@ public class Repository {
         String givenContent = "";
 
         if (headID != null) {
-            headContent = Utils.readContentsAsString(Utils.join(objects, headID));
+            headContent = new String(Utils.readObject(Utils.join(objects, headID), Blob.class).getContent());
         }
         if (givenID != null) {
-            givenContent = Utils.readContentsAsString(Utils.join(objects, givenID));
+            givenContent = new String(Utils.readObject(Utils.join(objects, givenID), Blob.class).getContent().toString());
         }
 
         String conflictContent =
@@ -281,7 +281,7 @@ public class Repository {
                         headContent +
                         "\n=======\n" +
                         givenContent +
-                        "\n>>>>>>>";
+                        "\n>>>>>>>\n";
 
         Utils.writeContents(new File(filename), conflictContent);
     }
