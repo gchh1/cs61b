@@ -1,7 +1,5 @@
 package gitlet;
 
-import java.io.IOException;
-
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author yhc
  */
@@ -10,7 +8,7 @@ public class Main {
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // Break when args are empty
         if (args[0].isEmpty()) {
             System.out.println(Failure.NO_INPUT_FAILURE);
@@ -29,7 +27,7 @@ public class Main {
             case "commit":
                 Failure.checkInit();
                 Failure.checkOPNum(args, 2);
-                Command.commit(args[1]);
+                Command.commit(args[1], null);
                 break;
             case "rm":
                 Failure.checkInit();
@@ -74,6 +72,12 @@ public class Main {
                 Failure.checkInit();
                 Failure.checkOPNum(args, 2);
                 Command.reset(args[1]);
+                break;
+            case "merge":
+                Failure.checkInit();
+                Failure.checkOPNum(args, 2);
+                Command.merge(args[1]);
+                break;
 
             default:
                 System.out.println(Failure.INPUT_NOT_EXIST_FAILURE);

@@ -1,7 +1,6 @@
 package gitlet;
 
-import java.io.File;
-import java.io.IOException;
+
 import java.util.*;
 
 import static gitlet.Utils.plainFilenamesIn;
@@ -17,7 +16,7 @@ public class Command {
         Repository.initDir();
 
         // Step2: Generate a init commit
-        Commit initCommit = new Commit("initial commit", null);
+        Commit initCommit = new Commit("initial commit", null, null);
 
         // Step3: Create a branch called master
         Repository.updateHead(initCommit.getID());
@@ -51,7 +50,7 @@ public class Command {
     }
 
     /** commit command */
-    public static void commit(String message) {
+    public static void commit(String message, String parent2) {
         // Get the HEAD commit -- the parent
         Commit parent = Repository.getHEAD();
 
@@ -59,7 +58,7 @@ public class Command {
         Stage stage = Repository.readStage();
 
         // Declare a Commit object
-        Commit commit = new Commit(message, parent.getID());
+        Commit commit = new Commit(message, parent.getID(), parent2);
 
         // Add and remove file from the parent Commit
         commit.modifyTracedFile(parent, stage);
@@ -96,15 +95,6 @@ public class Command {
     public static void log() {
         // Iterate the commits
         Commit it = Repository.getHEAD();
-
-        /* TODO: Handle merge case
-            ===
-            commit 3e8bf1d794ca2e9ef8a4007275acf3751c7170ff
-            Merge: 4975af1 2c1ead1
-            Date: Sat Nov 11 12:30:00 2017 -0800
-            Merged development into master.
-         */
-
 
         // Traverse the commits from HEAD commit through the parent id
         while (it != null) {
@@ -359,6 +349,111 @@ public class Command {
 
     /** merge command */
     public static void merge(String branchName) {
-        
+        // Step1: get the split point
+        Commit splitCommit = Repository.getSplit(branchName);
+        Commit currCommit = Repository.getHEAD();
+        Commit branchCommit = Repository.getBranchHead(branchName);
+        if (splitCommit != null) {
+            if (splitCommit.getID().equals(branchCommit.getID())) {
+                System.out.println(Failure.SPLIT_SAME_BRANCH);
+                System.exit(0);
+            }
+            if (splitCommit.getID().equals(currCommit.getID())) {
+                Repository.checkoutCommit(branchCommit);
+                System.out.println(Failure.SPLIT_SAME_HEAD);
+                System.exit(0);
+            }
+
+            // Set for all files
+            Set<String> files = new HashSet<>();
+            Set<String> splitFiles = splitCommit.getTrackedFiles().keySet();
+            Set<String> currFiles = currCommit.getTrackedFiles().keySet();
+            Set<String> branchFiles = branchCommit.getTrackedFiles().keySet();
+
+            files.addAll(splitFiles);
+            files.addAll(currFiles);
+            files.addAll(branchFiles);
+
+
+            boolean isConflict = false;
+            Stage stage = Repository.readStage();
+
+            // Begin merge
+            for (String file : files) {
+                // Modified in the given branch but not in the current branch, checkout them and stage
+                // Modified in the current branch but not in the given branch, do nothing
+                // Modified in the same way or be deleted, do nothing
+                // Only in the current branch, do nothing
+                // Only in the given branch, checkout them and stage
+                // Unmodified in the current branch but deleted in the given, do nothing
+                // Unmodified in the given branch but deleted in the current, delete
+
+                boolean inSplit = splitFiles.contains(file);
+                boolean inCurr = currFiles.contains(file);
+                boolean inGiven = branchFiles.contains(file);
+
+                String splitID = inSplit ? splitCommit.getBlobID(file) : null;
+                String currID = inCurr ? currCommit.getBlobID(file) : null;
+                String givenID = inGiven ? branchCommit.getBlobID(file) : null;
+
+                // === Rule 1 === Modified in given, unmodified in current
+                if (inSplit && inCurr && inGiven &&
+                        splitID.equals(currID) && !splitID.equals(givenID)) {
+                    Repository.checkoutFile(file, branchCommit);
+                    stage.addFile(file, Repository.getBlob(givenID));
+                    continue;
+                }
+
+                // === Rule 2 === Modified in current, unmodified in given -> do nothing
+                if (inSplit && inCurr && inGiven &&
+                        splitID.equals(givenID) && !splitID.equals(currID)) {
+                    continue;
+                }
+
+                // === Rule 3 === Modified in same way or both deleted -> do nothing
+                if ((inSplit && inCurr && inGiven &&
+                        !splitID.equals(currID) && currID.equals(givenID)) ||
+                        (!inCurr && !inGiven && inSplit)) {
+                    continue;
+                }
+
+                // === Rule 4 === Only in current branch -> do nothing
+                if (!inSplit && inCurr && !inGiven) {
+                    continue;
+                }
+
+                // === Rule 5 === Only in given branch -> checkout and stage
+                if ((!inSplit && !inCurr && inGiven) || (!inSplit && inCurr && inGiven && currID.equals(givenID)) ) {
+                    Repository.checkoutFile(file, branchCommit);
+                    stage.addFile(file, Repository.getBlob(givenID));
+                    continue;
+                }
+
+                // === Rule 6 === Present at split, unmodified in current, absent in given -> remove
+                if (inSplit && inCurr && !inGiven && splitID.equals(currID)) {
+                    Utils.restrictedDelete(file);
+                    stage.removeFile(file);
+                    continue;
+                }
+
+                // === Rule 7 === Present at split, unmodified in given, absent in current -> remain absent
+                if (inSplit && !inCurr && inGiven && splitID.equals(givenID)) {
+                    continue;
+                }
+
+
+                // === Rule 8 === Conflict
+                isConflict = true;
+                Repository.handleConflict(file, currID, givenID);
+            }
+
+            // Merge commit
+            if (isConflict) {
+                System.out.println(Failure.MERGE_CONFLICT);
+                System.exit(0);
+            } else {
+                commit("Merged " + branchName + " into " + Repository.getCurrentBranch() + ".", branchCommit.getID());
+            }
+        }
     }
 }

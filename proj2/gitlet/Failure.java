@@ -24,6 +24,9 @@ public class Failure {
     protected static final String BRANCH_NAME_EXIST = "A branch with that name already exists.";
     protected static final String BRANCH_NAME_NOT_EXIST = "A branch with that name does not exist.";
     protected static final String CANNOT_RM_CURRENT_BRANCH = "Cannot remove the current branch.";
+    protected static final String SPLIT_SAME_BRANCH = "Given branch is an ancestor of the current branch.";
+    protected static final String SPLIT_SAME_HEAD = "Current branch fast-forwarded.";
+    protected static final String MERGE_CONFLICT = "Encountered a merge conflict.";
 
 
     // Check if the directory has been initialized

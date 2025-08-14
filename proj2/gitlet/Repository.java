@@ -220,4 +220,57 @@ public class Repository {
         Repository.writeStage(stage);
     }
 
+    /** Get the split commit */
+    public static Commit getSplit(String branchName) {
+        Set<String> ancestors = new HashSet<>();
+        Queue<Commit> queue = new ArrayDeque<>();
+
+        // Get all the ancestors of HEAD
+        queue.add(Repository.getHEAD());
+        while (!queue.isEmpty()) {
+            Commit c = queue.poll();
+            if (c == null || ancestors.contains(c.getID())) {
+                continue;
+            }
+            ancestors.add(c.getID());
+            if (!(c.getParent() == null)) {
+                queue.add(c.getParent());
+            }
+            if (!(c.getParent2() == null)) {
+                queue.add(c.getParent2());
+            }
+        }
+
+        queue.add(Repository.getBranchHead(branchName));
+        while (!queue.isEmpty()) {
+            Commit c = queue.poll();
+            if (c == null) {
+                continue;
+            }
+            if (ancestors.contains(c.getID())) {
+                return c;
+            }
+            if (!(c.getParent() == null)) {
+                queue.add(c.getParent());
+            }
+            if (!(c.getParent2() == null)) {
+                queue.add(c.getParent2());
+            }
+        }
+        return null;
+    }
+
+    /** Handle merge conflict */
+    public static void handleConflict(String filename, String headID, String givenID) {
+        File file = Utils.join(CWD, filename);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Utils.writeContents(file, "<<<<<<< HEAD\n", getBlob(headID).getContent(),
+                "=======\n", getBlob(givenID).getContent(), ">>>>>>>");
+    }
 }

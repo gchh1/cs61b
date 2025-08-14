@@ -20,12 +20,14 @@ public class Commit implements GitletObject {
     private String timestamp;
     /** The parent(also a Commit) of this Commit. */
     private final String parent;
+    /** The second parent. Only exist in merge commit*/
+    private final String parent2;
     /** The file that the Commit tracked, represented by blob */
     private Map<String, Blob> trackedFiles;
 
 
     /** Constructor for a Commit object */
-    public Commit(String message, String parent) {
+    public Commit(String message, String parent, String parent2) {
         // init Commit
         if (parent == null) {
             this.timestamp = getFormatTimestamp(0L);
@@ -34,6 +36,7 @@ public class Commit implements GitletObject {
         this.timestamp = getFormatTimestamp(date.getTime());
         this.message = message;
         this.parent = parent;
+        this.parent2 = parent2;
         this.trackedFiles = new TreeMap<>();
     }
 
@@ -88,6 +91,16 @@ public class Commit implements GitletObject {
         return Repository.getCommit(parent);
     }
 
+    /** Return the second parent Commit through parent2 id */
+    public Commit getParent2() {
+        if (parent2 == null) {
+            return null;
+        }
+
+        // Get the parent commit by sha1 id
+        return Repository.getCommit(parent2);
+    }
+
     /** Return the traced files in the Commit */
     public Map<String, Blob> getTrackedFiles() {
         return trackedFiles;
@@ -107,9 +120,15 @@ public class Commit implements GitletObject {
                 // like: commit a0da1ea5a15ab613bf9961fd86f010cf74c7ee48
                 "\ncommit " + getID() +
 
+                // Append merge info
+                // like: Merge: 4975af1 2c1ead1
+                (parent2 == null ? "" : "\nMerge: " + parent.substring(0, 7) + " " + parent2.substring(0, 7)) +
+
                 // Append timestamp
                 // like: Date: Thu Nov 9 20:00:05 2017 -0800
                 "\nDate: " + timestamp +
+
+
 
                 // Append message
                 // like: A commit message.
