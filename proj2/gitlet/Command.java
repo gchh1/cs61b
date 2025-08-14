@@ -465,6 +465,21 @@ public class Command {
     public static void merge(String branchName) {
         Stage stage = Repository.readStage();
 
+        if (!Repository.getBranches().contains(branchName)) {
+            System.out.println(Failure.BRANCH_NAME_NOT_EXIST);
+            System.exit(0);
+        }
+
+        if (!stage.getAddition().isEmpty() || !stage.getRemoval().isEmpty()) {
+            System.out.println(Failure.STAGE_NOT_EMPTY);
+            System.exit(0);
+        }
+
+        if (branchName.equals(Repository.getCurrentBranch())) {
+            System.out.println(Failure.MERGE_ITSELF);
+            System.exit(0);
+        }
+
         // Step1: get the split point
         Commit splitCommit = Repository.getSplit(branchName);
         Commit currCommit = Repository.getHEAD();
@@ -505,6 +520,10 @@ public class Command {
 
                 boolean headChanged = inCurr && !Objects.equals(currID, splitID);
                 boolean givenChanged = inGiven && !Objects.equals(givenID, splitID);
+
+                if (inSplit && inCurr && inGiven && currID.equals(givenID)) {
+                    continue;
+                }
 
                 // Rule 1: Modified in given, unmodified in current
                 if (inSplit && Objects.equals(splitID, currID) && givenChanged) {

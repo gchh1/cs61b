@@ -30,6 +30,8 @@ public class Failure {
     protected static final String STAGE_EMPTY = "No changes added to the commit.";
     protected static final String NO_COMMIT_MESSAGE = "Please enter a commit message.";
     protected static final String FIND_NO_COMMIT = "Found no commit with that message.";
+    protected static final String STAGE_NOT_EMPTY = "You have uncommitted changes.";
+    protected static final String MERGE_ITSELF = "Cannot merge a branch with itself.";
 
 
     // Check if the directory has been initialized
