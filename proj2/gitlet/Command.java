@@ -75,6 +75,9 @@ public class Command {
 
         // Add and remove file from the parent Commit
         commit.modifyTracedFile(parent, stage);
+        if (isMerge) {
+            commit.modifyTracedFile(Repository.getCommit(parent2), stage);
+        }
 
         // Clear the stage area
         stage.clear();
@@ -561,6 +564,8 @@ public class Command {
                 else {
                     isConflict = true;
                     Repository.handleConflict(file, currID, givenID);
+                    Blob conflictBlob = new Blob(file);
+                    stage.addFile(file, conflictBlob);
                 }
             }
 
