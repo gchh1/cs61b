@@ -27,25 +27,26 @@ public class Command {
 
     /** add command */
     public static void add(String filename) {
-        // Get the blob by the filename
         Blob blob = new Blob(filename);
-
-        // Add the file into objects folder
         Repository.saveObject(blob);
 
         Stage stage = Repository.readStage();
-
-        // Judge whether the content of the file named filename is modified,
-        // do not stage it, meaning that remove the file from both addition and removal
         Commit HEADCommit = Repository.getHEAD();
-        if (blob.getID().equals(HEADCommit.getBlobID(filename))) {
-             stage.removeFile(filename);
+
+        String headBlobID = HEADCommit.getBlobID(filename);
+        boolean sameAsHead = blob.getID().equals(headBlobID);
+
+        if (sameAsHead) {
+            // 如果文件在 removed 集合中 -> unremove
+            if (stage.getRemoval().contains(filename)) {
+                stage.unremoveFile(filename);  // 只从 removed 集合中删除
+            }
+            // 如果文件不在 removed 集合中，且和 HEAD 一样 -> 什么也不做
         } else {
-            // Add the file into the stage area
+            // 普通 add
             stage.addFile(filename, blob);
         }
 
-        // Save the stage
         Repository.writeStage(stage);
     }
 

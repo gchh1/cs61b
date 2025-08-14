@@ -36,6 +36,11 @@ public class Stage implements Serializable {
         addition.remove(filename);
     }
 
+    /** Unremoved file */
+    public void unremoveFile(String filename) {
+        removal.remove(filename);
+    }
+
     /** Clear the stage area */
     public void clear() {
         addition.clear();
