@@ -233,7 +233,9 @@ public class Command {
         // Step5: Print untracked files
         System.out.println("=== Untracked Files ===");
 
-
+        for (String s : untrackedFiles) {
+            System.out.println(s);
+        }
         // Print 2 line breaks
 
         System.out.print("\n");
@@ -523,6 +525,8 @@ public class Command {
 
                 boolean headChanged = inCurr && !Objects.equals(currID, splitID);
                 boolean givenChanged = inGiven && !Objects.equals(givenID, splitID);
+
+                Repository.checkUntrackedConflict(currCommit, branchCommit, stage);
 
                 if (inSplit && inCurr && inGiven && currID.equals(givenID)) {
                     continue;

@@ -10,7 +10,7 @@ public class Main {
      */
     public static void main(String[] args) {
         // Break when args are empty
-        if (args[0].isEmpty()) {
+        if (args.length == 0) {
             System.out.println(Failure.NO_INPUT_FAILURE);
             System.exit(0);
         }

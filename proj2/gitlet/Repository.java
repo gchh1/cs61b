@@ -188,21 +188,7 @@ public class Repository {
         Commit currCommit = Repository.getHEAD();
         Stage stage = Repository.readStage();
 
-        List<String> workingFiles = Utils.plainFilenamesIn(Repository.CWD);
-        if (workingFiles == null) {
-            workingFiles = new ArrayList<>();
-        }
-
-        for (String file : workingFiles) {
-            boolean untrackedExist = (!currCommit.getTrackedFiles().containsKey(file) &&
-                    !stage.getAddition().containsKey(file));
-            boolean willOverride = tarCommit.getTrackedFiles().containsKey(file);
-
-            if (untrackedExist && willOverride) {
-                System.out.println(Failure.UNTRACED_FILE_EXIST);
-                System.exit(0);
-            }
-        }
+        checkUntrackedConflict(currCommit, tarCommit, stage);
 
         // Delete the file that exist in the current commit but not be tracked by tarCommit
         for (String file : currCommit.getTrackedFiles().keySet()) {
@@ -222,6 +208,26 @@ public class Repository {
         // Clean the stage area
         stage.clear();
         Repository.writeStage(stage);
+    }
+
+    /** Check if there exists a file that is untracked and will be overwritten */
+    public static void checkUntrackedConflict(Commit currCommit, Commit tarCommit, Stage stage) {
+
+        List<String> workingFiles = Utils.plainFilenamesIn(Repository.CWD);
+        if (workingFiles == null) {
+            workingFiles = new ArrayList<>();
+        }
+
+        for (String file : workingFiles) {
+            boolean untrackedExist = (!currCommit.getTrackedFiles().containsKey(file) &&
+                    !stage.getAddition().containsKey(file));
+            boolean willOverride = tarCommit.getTrackedFiles().containsKey(file);
+
+            if (untrackedExist && willOverride) {
+                System.out.println(Failure.UNTRACED_FILE_EXIST);
+                System.exit(0);
+            }
+        }
     }
 
     /** Get the split commit */
