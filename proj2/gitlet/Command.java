@@ -449,6 +449,8 @@ public class Command {
                 Repository.handleConflict(file, currID, givenID);
             }
 
+            Repository.writeStage(stage);
+
             // Merge commit
             if (isConflict) {
                 System.out.println(Failure.MERGE_CONFLICT);
