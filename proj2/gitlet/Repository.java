@@ -276,13 +276,15 @@ public class Repository {
             givenContent = new String(Utils.readObject(Utils.join(objects, givenID), Blob.class).getContent());
         }
 
-        String conflictContent =
-                "<<<<<<< HEAD\n" +
-                        headContent +
-                        "\n=======\n" +
-                        givenContent +
-                        "\n>>>>>>>\n";
+        String conflictContent = "<<<<<<< HEAD\n" + headContent + "=======\n" + givenContent + ">>>>>>>";
 
-        Utils.writeContents(new File(filename), conflictContent);
+        // 修复1：正确的文件路径
+        Utils.writeContents(Utils.join(CWD, filename), conflictContent);
+
+        // 修复2：添加到暂存区（这是关键！）
+        Stage stage = Repository.readStage();
+        Blob conflictBlob = new Blob(filename);
+        stage.addFile(filename, conflictBlob);
+        Repository.writeStage(stage);
     }
 }
