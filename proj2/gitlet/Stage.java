@@ -31,6 +31,7 @@ public class Stage implements Serializable {
     public void removeFile(String filename) {
         if (!addition.containsKey(filename)) {
             removal.add(filename);
+            Utils.restrictedDelete(filename);
         }
         addition.remove(filename);
     }
