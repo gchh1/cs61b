@@ -535,16 +535,19 @@ public class Command {
                 }
                 // Rule 2: Modified in current, unmodified in given
                 else if (inSplit && headChanged && Objects.equals(splitID, givenID)) {
-                    // do nothing
+                    stage.addFile(file, Repository.getBlob(currID));
                 }
                 // Rule 3: Same modification or both deleted
-                else if ((headChanged && givenChanged && Objects.equals(currID, givenID)) ||
-                        (!inCurr && !inGiven && inSplit)) {
-                    // do nothing
+                else if ((headChanged && givenChanged && Objects.equals(currID, givenID)
+                        )) {
+                    stage.addFile(file, Repository.getBlob(currID));
+                }
+                else if (!inCurr && !inGiven && inSplit) {
+                    stage.removeFile(file);
                 }
                 // Rule 4: Only in current branch
                 else if (!inSplit && inCurr && !inGiven) {
-                    // do nothing
+                    stage.addFile(file, Repository.getBlob(currID));
                 }
                 // Rule 5: Only in given branch
                 else if (!inSplit && inGiven && !inCurr) {
@@ -558,7 +561,7 @@ public class Command {
                 }
                 // Rule 7: Unmodified in given, deleted in current
                 else if (inSplit && !inCurr && Objects.equals(splitID, givenID)) {
-                    // do nothing
+                    stage.removeFile(file);
                 }
                 // Conflict case
                 else {

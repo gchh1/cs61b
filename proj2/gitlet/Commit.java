@@ -118,6 +118,7 @@ public class Commit implements GitletObject {
     @Override
     public String toString() {
 
+
         return "===" +
                 // Append commit information
                 // like: commit a0da1ea5a15ab613bf9961fd86f010cf74c7ee48
@@ -131,10 +132,9 @@ public class Commit implements GitletObject {
                 // like: Date: Thu Nov 9 20:00:05 2017 -0800
                 "\nDate: " + timestamp +
 
-
-
                 // Append message
                 // like: A commit message.
                 "\n" + message + "\n";
+
     }
 }
