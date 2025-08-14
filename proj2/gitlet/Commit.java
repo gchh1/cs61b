@@ -1,5 +1,6 @@
 package gitlet;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /** Represents a gitlet commit object.
@@ -24,6 +25,8 @@ public class Commit implements GitletObject {
     private final String parent2;
     /** The file that the Commit tracked, represented by blob */
     private Map<String, Blob> trackedFiles;
+    /** Format for the timestamp */
+    private static final String DATE_FORMAT = "EEE MMM dd HH:mm:ss yyyy Z";
 
 
     /** Constructor for a Commit object */
@@ -46,9 +49,9 @@ public class Commit implements GitletObject {
      */
     private String getFormatTimestamp(long time) {
         Date date = new Date(time);
-        Formatter formatter = new Formatter(Locale.ENGLISH);
-        formatter.format("%1$tT UTC, %1$tA, %1$te %1$tB %1$tY", date);
-        return formatter.toString();
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
+        formatter.setTimeZone(TimeZone.getDefault());
+        return formatter.format(date);
     }
 
     /** Get the id of a Commit, through sha1 */
