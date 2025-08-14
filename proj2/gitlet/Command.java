@@ -569,11 +569,11 @@ public class Command {
             // Merge commit
             if (isConflict) {
                 System.out.println(Failure.MERGE_CONFLICT);
-                System.exit(0);
-            } else {
-                commit("Merged " + branchName + " into " + Repository.getCurrentBranch() + ".",
-                        branchCommit.getID(), true);
+
             }
+            commit("Merged " + branchName + " into " + Repository.getCurrentBranch() + ".",
+                        branchCommit.getID(), true);
+
         }
     }
 }
