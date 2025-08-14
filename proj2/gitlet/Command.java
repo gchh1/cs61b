@@ -51,7 +51,7 @@ public class Command {
     }
 
     /** commit command */
-    public static void commit(String message, String parent2) {
+    public static void commit(String message, String parent2, boolean isMerge) {
         // Handle empty message
         if (message.isEmpty()) {
             System.out.println(Failure.NO_COMMIT_MESSAGE);
@@ -65,7 +65,7 @@ public class Command {
         Stage stage = Repository.readStage();
 
         // Handle empty stage area
-        if (stage.getAddition().isEmpty() && stage.getRemoval().isEmpty()) {
+        if (!isMerge && stage.getAddition().isEmpty() && stage.getRemoval().isEmpty()) {
             System.out.println(Failure.STAGE_EMPTY);
             System.exit(0);
         }
@@ -454,7 +454,7 @@ public class Command {
                 System.out.println(Failure.MERGE_CONFLICT);
                 System.exit(0);
             } else {
-                commit("Merged " + branchName + " into " + Repository.getCurrentBranch() + ".", branchCommit.getID());
+                commit("Merged " + branchName + " into " + Repository.getCurrentBranch() + ".", branchCommit.getID(), true);
             }
         }
     }

@@ -179,7 +179,7 @@ public class Repository {
 
     /** Delete the branch with that name */
     public static void deleteBranch(String branchName) {
-        Utils.restrictedDelete(Utils.join(heads, branchName));
+        Utils.join(heads, branchName).delete();
     }
 
     /** Check untracked files */

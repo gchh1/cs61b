@@ -27,7 +27,7 @@ public class Main {
             case "commit":
                 Failure.checkInit();
                 Failure.checkOPNum(args, 2);
-                Command.commit(args[1], null);
+                Command.commit(args[1], null, false);
                 break;
             case "rm":
                 Failure.checkInit();
