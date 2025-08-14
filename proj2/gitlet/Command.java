@@ -350,11 +350,126 @@ public class Command {
     }
 
     /** merge command */
+//    public static void merge(String branchName) {
+//        // Step1: get the split point
+//        Commit splitCommit = Repository.getSplit(branchName);
+//        Commit currCommit = Repository.getHEAD();
+//        Commit branchCommit = Repository.getBranchHead(branchName);
+//        if (splitCommit != null) {
+//            if (splitCommit.getID().equals(branchCommit.getID())) {
+//                System.out.println(Failure.SPLIT_SAME_BRANCH);
+//                System.exit(0);
+//            }
+//            if (splitCommit.getID().equals(currCommit.getID())) {
+//                Repository.checkoutCommit(branchCommit);
+//                System.out.println(Failure.SPLIT_SAME_HEAD);
+//                System.exit(0);
+//            }
+//
+//            // Set for all files
+//            Set<String> files = new HashSet<>();
+//            Set<String> splitFiles = splitCommit.getTrackedFiles().keySet();
+//            Set<String> currFiles = currCommit.getTrackedFiles().keySet();
+//            Set<String> branchFiles = branchCommit.getTrackedFiles().keySet();
+//
+//            files.addAll(splitFiles);
+//            files.addAll(currFiles);
+//            files.addAll(branchFiles);
+//
+//
+//            boolean isConflict = false;
+//            Stage stage = Repository.readStage();
+//
+//            // Begin merge
+//            for (String file : files) {
+//                // Modified in the given branch but not in the current branch, checkout them and stage
+//                // Modified in the current branch but not in the given branch, do nothing
+//                // Modified in the same way or be deleted, do nothing
+//                // Only in the current branch, do nothing
+//                // Only in the given branch, checkout them and stage
+//                // Unmodified in the current branch but deleted in the given, do nothing
+//                // Unmodified in the given branch but deleted in the current, delete
+//
+//                boolean inSplit = splitFiles.contains(file);
+//                boolean inCurr = currFiles.contains(file);
+//                boolean inGiven = branchFiles.contains(file);
+//
+//                String splitID = inSplit ? splitCommit.getBlobID(file) : null;
+//                String currID = inCurr ? currCommit.getBlobID(file) : null;
+//                String givenID = inGiven ? branchCommit.getBlobID(file) : null;
+//
+//                boolean headChanged = currID != null && !currID.equals(splitID);
+//                boolean givenChanged = givenID != null && !givenID.equals(splitID);
+//
+//                // Rule 1: Modified in given, unmodified in current
+//                if (inSplit && splitID.equals(currID) && givenChanged) {
+//                    Repository.checkoutFile(file, branchCommit);
+//                    stage.addFile(file, Repository.getBlob(givenID));
+//                    continue;
+//                }
+//
+//                // Rule 2: Modified in current, unmodified in given
+//                if (inSplit && headChanged && splitID.equals(givenID)) {
+//                    continue;
+//                }
+//
+//                // Rule 3: Same modification or both deleted
+//                if ((headChanged && currID.equals(givenID)) ||
+//                        (!inCurr && !inGiven && inSplit)) {
+//                    continue;
+//                }
+//
+//                // Rule 4: Only in current branch
+//                if (!inSplit && inCurr && !inGiven) {
+//                    continue;
+//                }
+//
+//                // Rule 5: Only in given branch
+//                if (!inSplit && inGiven && (!inCurr || currID.equals(givenID))) {
+//                    Repository.checkoutFile(file, branchCommit);
+//                    stage.addFile(file, Repository.getBlob(givenID));
+//                    continue;
+//                }
+//
+//                // Rule 6: Unmodified in current, deleted in given
+//                if (inSplit && splitID.equals(currID) && !inGiven) {
+//                    Utils.restrictedDelete(file);
+//                    stage.removeFile(file);
+//                    continue;
+//                }
+//
+//                // Rule 7: Unmodified in given, deleted in current
+//                if (inSplit && !inCurr && splitID.equals(givenID)) {
+//                    continue;
+//                }
+//
+//                // Conflict case
+//                if (headChanged && givenChanged && !currID.equals(givenID)) {
+//                    isConflict = true;
+//                    Repository.handleConflict(file, currID, givenID);
+//                }
+//            }
+//
+//            Repository.writeStage(stage);
+//
+//            // Merge commit
+//            if (isConflict) {
+//                System.out.println(Failure.MERGE_CONFLICT);
+//                System.exit(0);
+//            } else {
+//                commit("Merged " + branchName + " into " + Repository.getCurrentBranch() + ".", branchCommit.getID(), true);
+//            }
+//        }
+//    }
+
     public static void merge(String branchName) {
+        Stage stage = Repository.readStage();
+
         // Step1: get the split point
         Commit splitCommit = Repository.getSplit(branchName);
         Commit currCommit = Repository.getHEAD();
         Commit branchCommit = Repository.getBranchHead(branchName);
+
         if (splitCommit != null) {
             if (splitCommit.getID().equals(branchCommit.getID())) {
                 System.out.println(Failure.SPLIT_SAME_BRANCH);
@@ -376,20 +491,10 @@ public class Command {
             files.addAll(currFiles);
             files.addAll(branchFiles);
 
-
             boolean isConflict = false;
-            Stage stage = Repository.readStage();
 
             // Begin merge
             for (String file : files) {
-                // Modified in the given branch but not in the current branch, checkout them and stage
-                // Modified in the current branch but not in the given branch, do nothing
-                // Modified in the same way or be deleted, do nothing
-                // Only in the current branch, do nothing
-                // Only in the given branch, checkout them and stage
-                // Unmodified in the current branch but deleted in the given, do nothing
-                // Unmodified in the given branch but deleted in the current, delete
-
                 boolean inSplit = splitFiles.contains(file);
                 boolean inCurr = currFiles.contains(file);
                 boolean inGiven = branchFiles.contains(file);
@@ -398,55 +503,46 @@ public class Command {
                 String currID = inCurr ? currCommit.getBlobID(file) : null;
                 String givenID = inGiven ? branchCommit.getBlobID(file) : null;
 
-                // === Rule 1 === Modified in given, unmodified in current
-                if (inSplit && inCurr && inGiven &&
-                        splitID.equals(currID) && !splitID.equals(givenID)) {
+                boolean headChanged = inCurr && !Objects.equals(currID, splitID);
+                boolean givenChanged = inGiven && !Objects.equals(givenID, splitID);
+
+                // Rule 1: Modified in given, unmodified in current
+                if (inSplit && Objects.equals(splitID, currID) && givenChanged) {
                     Repository.checkoutFile(file, branchCommit);
                     stage.addFile(file, Repository.getBlob(givenID));
-                    continue;
                 }
-
-                // === Rule 2 === Modified in current, unmodified in given -> do nothing
-                if (inSplit && inCurr && inGiven &&
-                        splitID.equals(givenID) && !splitID.equals(currID)) {
-                    continue;
+                // Rule 2: Modified in current, unmodified in given
+                else if (inSplit && headChanged && Objects.equals(splitID, givenID)) {
+                    // do nothing
                 }
-
-                // === Rule 3 === Modified in same way or both deleted -> do nothing
-                if ((inSplit && inCurr && inGiven &&
-                        !splitID.equals(currID) && currID.equals(givenID)) ||
+                // Rule 3: Same modification or both deleted
+                else if ((headChanged && givenChanged && Objects.equals(currID, givenID)) ||
                         (!inCurr && !inGiven && inSplit)) {
-                    continue;
+                    // do nothing
                 }
-
-                // === Rule 4 === Only in current branch -> do nothing
-                if (!inSplit && inCurr && !inGiven) {
-                    continue;
+                // Rule 4: Only in current branch
+                else if (!inSplit && inCurr && !inGiven) {
+                    // do nothing
                 }
-
-                // === Rule 5 === Only in given branch -> checkout and stage
-                if ((!inSplit && !inCurr && inGiven) || (!inSplit && inCurr && inGiven && currID.equals(givenID)) ) {
+                // Rule 5: Only in given branch
+                else if (!inSplit && inGiven && !inCurr) {
                     Repository.checkoutFile(file, branchCommit);
                     stage.addFile(file, Repository.getBlob(givenID));
-                    continue;
                 }
-
-                // === Rule 6 === Present at split, unmodified in current, absent in given -> remove
-                if (inSplit && inCurr && !inGiven && splitID.equals(currID)) {
+                // Rule 6: Unmodified in current, deleted in given
+                else if (inSplit && Objects.equals(splitID, currID) && !inGiven) {
                     Utils.restrictedDelete(file);
                     stage.removeFile(file);
-                    continue;
                 }
-
-                // === Rule 7 === Present at split, unmodified in given, absent in current -> remain absent
-                if (inSplit && !inCurr && inGiven && splitID.equals(givenID)) {
-                    continue;
+                // Rule 7: Unmodified in given, deleted in current
+                else if (inSplit && !inCurr && Objects.equals(splitID, givenID)) {
+                    // do nothing
                 }
-
-
-                // === Rule 8 === Conflict
-                isConflict = true;
-                Repository.handleConflict(file, currID, givenID);
+                // Conflict case
+                else {
+                    isConflict = true;
+                    Repository.handleConflict(file, currID, givenID);
+                }
             }
 
             Repository.writeStage(stage);
@@ -456,7 +552,8 @@ public class Command {
                 System.out.println(Failure.MERGE_CONFLICT);
                 System.exit(0);
             } else {
-                commit("Merged " + branchName + " into " + Repository.getCurrentBranch() + ".", branchCommit.getID(), true);
+                commit("Merged " + branchName + " into " + Repository.getCurrentBranch() + ".",
+                        branchCommit.getID(), true);
             }
         }
     }
