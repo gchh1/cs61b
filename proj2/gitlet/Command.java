@@ -52,11 +52,23 @@ public class Command {
 
     /** commit command */
     public static void commit(String message, String parent2) {
+        // Handle empty message
+        if (message.isEmpty()) {
+            System.out.println(Failure.NO_COMMIT_MESSAGE);
+            System.exit(0);
+        }
+
         // Get the HEAD commit -- the parent
         Commit parent = Repository.getHEAD();
 
         // Read the stage area
         Stage stage = Repository.readStage();
+
+        // Handle empty stage area
+        if (stage.getAddition().isEmpty() && stage.getRemoval().isEmpty()) {
+            System.out.println(Failure.STAGE_EMPTY);
+            System.exit(0);
+        }
 
         // Declare a Commit object
         Commit commit = new Commit(message, parent.getID(), parent2);
@@ -229,12 +241,19 @@ public class Command {
 
     public static void find(String message) {
         List<Commit> commits = Repository.getAllCommits();
+        boolean isFound = false;
 
         // Filter the commit
         for (Commit item : commits) {
             if (item.getMessage().equals(message)) {
                 System.out.println(item.getID());
+                isFound = true;
             }
+        }
+
+        if (!isFound) {
+            System.out.println(Failure.FIND_NO_COMMIT);
+            System.exit(0);
         }
 
     }

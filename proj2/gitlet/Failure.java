@@ -15,7 +15,7 @@ public class Failure {
                                                 "in the current directory";
     protected static final String FILE_NOT_EXIST_FAILURE = "File does not exits.";
     protected static final String RM_ERROR_FAILURE = "No reason to remove the file.";
-    protected static final String FILE_NOT_EXIST_COMMIT_FAILURE = "File does not exist in that                                                                     commit.";
+    protected static final String FILE_NOT_EXIST_COMMIT_FAILURE = "File does not exist in that commit.";
     protected static final String COMMIT_NOT_EXIST = "No commit with that id exists.";
     protected static final String BRANCH_NOT_EXIST = "No such branch exists.";
     protected static final String NO_NEED_CHECKOUT_BRANCH = "No need to checkout the current branch.";
@@ -27,6 +27,9 @@ public class Failure {
     protected static final String SPLIT_SAME_BRANCH = "Given branch is an ancestor of the current branch.";
     protected static final String SPLIT_SAME_HEAD = "Current branch fast-forwarded.";
     protected static final String MERGE_CONFLICT = "Encountered a merge conflict.";
+    protected static final String STAGE_EMPTY = "No changes added to the commit.";
+    protected static final String NO_COMMIT_MESSAGE = "Please enter a commit message.";
+    protected static final String FIND_NO_COMMIT = "Found no commit with that message.";
 
 
     // Check if the directory has been initialized
