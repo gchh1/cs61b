@@ -266,15 +266,23 @@ public class Repository {
 
     /** Handle merge conflict */
     public static void handleConflict(String filename, String headID, String givenID) {
-        File file = Utils.join(CWD, filename);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        String headContent = "";
+        String givenContent = "";
+
+        if (headID != null) {
+            headContent = Utils.readContentsAsString(Utils.join(objects, headID));
         }
-        Utils.writeContents(file, "<<<<<<< HEAD\n", getBlob(headID).getContent(),
-                "=======\n", getBlob(givenID).getContent(), ">>>>>>>");
+        if (givenID != null) {
+            givenContent = Utils.readContentsAsString(Utils.join(objects, givenID));
+        }
+
+        String conflictContent =
+                "<<<<<<< HEAD\n" +
+                        headContent +
+                        "\n=======\n" +
+                        givenContent +
+                        "\n>>>>>>>\n";
+
+        Utils.writeContents(new File(filename), conflictContent);
     }
 }
