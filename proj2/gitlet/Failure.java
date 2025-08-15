@@ -32,6 +32,8 @@ public class Failure {
     protected static final String FIND_NO_COMMIT = "Found no commit with that message.";
     protected static final String STAGE_NOT_EMPTY = "You have uncommitted changes.";
     protected static final String MERGE_ITSELF = "Cannot merge a branch with itself.";
+    protected static final String REMOTE_NOT_EXIST = "A remote with that name does not exist.";
+    protected static final String REMOTE_EXIST = "A remote with that name already exists.";
 
 
     // Check if the directory has been initialized

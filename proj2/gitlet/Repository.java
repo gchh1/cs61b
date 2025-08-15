@@ -33,6 +33,8 @@ public class Repository {
     public static final File objects = join(GITLET_DIR, "objects");
     /** The stage file */
     public static final File stage = join(GITLET_DIR, "stage");
+    /** The remotes file */
+    public static final File remotes = join(GITLET_DIR, "remotes");
 
 
     /** Creates a new Gitlet version-control system in the current directory. */
@@ -289,5 +291,29 @@ public class Repository {
 
         // 修复2：添加到暂存区（这是关键！）
 
+    }
+
+    /** Save remote */
+    public static void saveRemote(String name, String path) {
+        if (!remotes.exists()) {
+            remotes.mkdir();
+        }
+        if (getRemote(name) != null) {
+            System.out.println(Failure.REMOTE_EXIST);
+            System.exit(0);
+        }
+        File file = join(remotes, name);
+        writeContents(file, path);
+    }
+
+    /** Get the remote path */
+    public static String getRemote(String name) {
+        File file = join(remotes, name);
+        if (file.exists()) {
+            return readContentsAsString(file);
+        } else {
+            System.out.println(Failure.REMOTE_NOT_EXIST);
+            return null;
+        }
     }
 }

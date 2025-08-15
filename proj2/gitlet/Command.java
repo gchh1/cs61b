@@ -588,4 +588,19 @@ public class Command {
 
         }
     }
+
+    /** add-remote command */
+    public static void addRemote(String name, String path) {
+        Repository.saveRemote(name, path);
+    }
+
+    /** rm-remote command */
+    public static void rmRemote(String name) {
+        if (Repository.getRemote(name) == null) {
+            System.exit(0);
+        } else {
+            Utils.restrictedDelete(Utils.join(Repository.remotes, name));
+        }
+    }
+
 }
