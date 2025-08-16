@@ -86,7 +86,9 @@ public class Repository {
 
     /** Save a Serializable objects into the objects directory */
     public static void saveObject(GitletObject o) {
-        File file = Utils.join(objects, o.getID());
+        File objectFolder = Utils.join(objects, o.getID().substring(0, 8));
+        objectFolder.mkdir();
+        File file = Utils.join(objectFolder, o.getID());
         Utils.writeObject(file, o);
     }
 
@@ -105,18 +107,17 @@ public class Repository {
         File file = Utils.join(heads, Repository.getCurrentBranch());
         String commitID = Utils.readContentsAsString(file);
 
-        File commitFile = Utils.join(objects, commitID);
-        return Utils.readObject(commitFile, Commit.class);
+        return getCommit(commitID);
     }
 
     /** Get the Commit through sha1 id */
     public static Commit getCommit(String id) {
-        File commitFile = Utils.join(objects, id);
+        File commitFile = Utils.join(objects, id.substring(0, 8));
         if (!commitFile.exists()) {
             System.out.println(Failure.COMMIT_NOT_EXIST);
             System.exit(0);
         }
-        return Utils.readObject(commitFile, Commit.class);
+        return Utils.readObject(Utils.join(commitFile, id), Commit.class);
     }
 
     /** Get all the commit files from a directory */
@@ -130,8 +131,8 @@ public class Repository {
             return commits;
         }
         for (String element : files) {
-            File file = Utils.join(objects, element);
-            Object o = Utils.readObject(file, GitletObject.class);
+            File file = Utils.join(objects, element.substring(0, 8));
+            Object o = Utils.readObject(Utils.join(file, element), GitletObject.class);
             if (o instanceof Commit) {
                commits.add((Commit) o);
             }
@@ -159,7 +160,7 @@ public class Repository {
 
     /** Get the Blob through sha1 id */
     public static Blob getBlob(String id) {
-        return Utils.readObject(Utils.join(objects, id), Blob.class);
+        return Utils.readObject(Utils.join(objects, id.substring(0, 8), id), Blob.class);
     }
 
     /** Rewrite a file with the target version */
