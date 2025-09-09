@@ -27,6 +27,8 @@ public class MemoryGame {
     private static final String[] ENCOURAGEMENT = {"You can do this!", "I believe in you!",
                                                    "You got this!", "You're a star!", "Go Bears!",
                                                    "Too easy for you!", "Wow, so impressive!"};
+    /** Failure phrase */
+    private static final String FAILURE = "Game Over! You made it to round: ";
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -53,32 +55,80 @@ public class MemoryGame {
         StdDraw.clear(Color.BLACK);
         StdDraw.enableDoubleBuffering();
 
-        //TODO: Initialize random number generator
+        rand = new Random(seed);
     }
 
     public String generateRandomString(int n) {
-        //TODO: Generate random string of letters of length n
-        return null;
+        StringBuilder s = new StringBuilder(n);
+        for (int i = 0; i < n; i++) {
+            s.append(CHARACTERS[RandomUtils.uniform(rand, 0, 26)]);
+        }
+        return s.toString();
     }
 
     public void drawFrame(String s) {
-        //TODO: Take the string and display it in the center of the screen
-        //TODO: If game is not over, display relevant game information at the top of the screen
+        // Clear the screen
+        StdDraw.clear();
+
+        // Draw background
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.filledRectangle(width / 2.0, height / 2.0, width / 2.0, height / 2.0);
+
+        // Set text font
+        StdDraw.setFont(new Font("Jokerman", Font.PLAIN, 23));
+        StdDraw.setPenColor(StdDraw.WHITE);
+
+        // Draw helpful ui
+        StdDraw.text(4, height - 1, "Round: " + round);
+        String tips = round % 2 == 1 ? "Watch!" : "Type!";
+        StdDraw.text(width / 2.0, height - 1, tips);
+        String e = ENCOURAGEMENT[RandomUtils.uniform(rand, 0, ENCOURAGEMENT.length)];
+        StdDraw.text(width - e.length() / 2.0 + 1, height - 1, e);
+        StdDraw.line(0, height - 2, width, height - 2);
+
+        // Drw text
+        StdDraw.setFont(new Font("Jokerman", Font.BOLD, 30));
+        StdDraw.text(width / 2.0, height / 2.0, s);
+        StdDraw.show();
+
     }
 
     public void flashSequence(String letters) {
-        //TODO: Display each character in letters, making sure to blank the screen between letters
+        for (int i = 0; i < letters.length(); i++) {
+            drawFrame(letters.substring(i, i + 1));
+            StdDraw.pause(1000);
+
+            drawFrame("");
+            StdDraw.pause(500);
+        }
     }
 
     public String solicitNCharsInput(int n) {
-        //TODO: Read n letters of player input
-        return null;
+        StringBuilder res = new StringBuilder();
+        while (res.toString().length() != n) {
+            if (StdDraw.hasNextKeyTyped()) {
+                res.append(StdDraw.nextKeyTyped());
+            }
+        }
+        return res.toString();
     }
 
     public void startGame() {
-        //TODO: Set any relevant variables before the game starts
+        round = 1;
+        String expect;
+        String input;
+        do {
+//            drawFrame("Round: " + round);
+//            StdDraw.pause(500);
+            expect = generateRandomString(round);
+            flashSequence(expect);
+            input = solicitNCharsInput(round);
+//            drawFrame(input);
+//            StdDraw.pause(500);
+            round++;
+        } while (input.equals(expect));
 
-        //TODO: Establish Engine loop
+        drawFrame(FAILURE + round);
     }
 
 }
