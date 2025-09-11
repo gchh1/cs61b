@@ -67,7 +67,7 @@ public class Engine {
         }
 
 
-        ter.initialize(WIDTH, HEIGHT);
+//        ter.initialize(WIDTH, HEIGHT);
         Player player = gs.getPlayer();
         player.setPlayer(world);
         player.move(input, world);
@@ -75,7 +75,7 @@ public class Engine {
         if (input.contains(":")) {
             Utils.saveGame(gs);
         }
-        ter.renderFrame(world.getWorld());
+//        ter.renderFrame(world.getWorld());
         return gs.getWorld();
     }
 }
