@@ -1,9 +1,11 @@
 package byow.TileEngine;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
 import edu.princeton.cs.introcs.StdDraw;
 import byow.Core.RandomUtils;
 
@@ -21,7 +23,7 @@ import byow.Core.RandomUtils;
  * to make your TETile class mutable, if you prefer.
  */
 
-public class TETile {
+public class TETile implements Serializable {
     private final char character; // Do not rename character or the autograder will break.
     private final Color textColor;
     private final Color backgroundColor;

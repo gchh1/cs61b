@@ -3,19 +3,17 @@ package byow.Core.map;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+import java.io.Serializable;
+
 /** Represent a point in the world */
 
-public class Point {
+public class Point implements Serializable {
     /** The x-coordinate of the Point */
-    protected int x;
+    public int x;
     /** The y-coordinate of the Point */
-    protected int y;
+    public int y;
     /** The Tile type of the Point */
     protected TETile tile = Tileset.NOTHING;
-    /** Whether the Point is marked */
-    protected boolean marked = false;
-    /** Whether the Point is in a room */
-    protected boolean inRoom = false;
 
 
     /** Constructor */
@@ -24,14 +22,20 @@ public class Point {
         this.y = y;
     }
 
-    /** Check if the point is valid */
-    public boolean checkPoint() {
-        return x >= 0 && x < World.WIDTH && y >= 0 && y < World.HEIGHT;
+    public Point(int x, int y, TETile tile) {
+        this.x = x;
+        this.y = y;
+        this.tile = tile;
     }
 
     /** Set the tile type of the Point */
     public void setTile(TETile t) {
         tile = t;
+    }
+
+    /** Return whether the point is walkable */
+    public boolean isWalkable() {
+        return tile.description().equals(Tileset.FLOOR.description());
     }
 
     @Override

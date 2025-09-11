@@ -1,8 +1,8 @@
 package byow.Core.map;
 
 import byow.Core.RandomUtils;
-import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,38 +10,43 @@ import java.util.Random;
 
 /** Generate a random world with the given seed */
 
-public class World {
+public class World implements WorldPrivilege {
     /** The width of the world */
-    protected static final int WIDTH = 100;
+    protected int WIDTH;
     /** The height of the world */
-    protected static final int HEIGHT = 60;
+    protected int HEIGHT;
     /** Random generator */
-    private Random random;
+    private final Random random;
+    /** List of rooms */
+    private List<Room> rooms;
     /** The List that represent a world */
-    private final List<Point> world = new ArrayList<>();
+    private List<Point> world;
 
 
-    /** Generate and render the world */
-    public void genWorld(long seed) {
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
-
+    /** Constructor */
+    public World(int w, int h, long seed) {
+        WIDTH = w;
+        HEIGHT = h;
+        random = new Random(seed);
+        world = new ArrayList<>();
+        rooms = new ArrayList<>();
         initWorld();
+        genRandWorld();
+    }
 
-        genRandWorld(seed);
-
-        ter.renderFrame(getWorld());
+    public World(TETile[][] w, long seed) {
+        WIDTH = w.length;
+        HEIGHT = w[0].length;
+        random = new Random(seed);
+        writeWorld(w);
     }
 
     /** Generate random world */
-    private void genRandWorld(long seed) {
-        // Initialize the random through the seed
-        random = new Random(seed);
+    private void genRandWorld() {
+        rooms = genRandRoom();
+        RoomSet rs = new RoomSet(rooms);
+        rs.connectRooms(this);
 
-        RoomSet rs = new RoomSet(genRandRoom(), this);
-        rs.connectRooms();
-
-//        genPath();
     }
 
 
@@ -71,13 +76,6 @@ public class World {
         return rooms;
     }
 
-    /** Generate path between each room */
-    private void genPath() {
-        Path path = new Path(this);
-//        path.genMaze(world.get(15));
-//        path.genPath();
-    }
-
     /** Initial the world with List type */
     private void initWorld() {
         for (int i = 0; i < WIDTH; i++) {
@@ -89,7 +87,7 @@ public class World {
     }
 
     /** Return the world with 2-dimensional array */
-    private TETile[][] getWorld() {
+    public TETile[][] getWorld() {
         TETile[][] res = new TETile[WIDTH][HEIGHT];
 
         for (int i = 0; i < WIDTH; i++) {
@@ -101,17 +99,56 @@ public class World {
         return res;
     }
 
+    /** Write the world */
+    public void writeWorld(TETile[][] w) {
+        world = new ArrayList<>();
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < HEIGHT; j++) {
+                Point p = new Point(i, j, w[i][j]);
+                if (p.tile == Tileset.AVATAR) {
+                    p.setTile(Tileset.FLOOR);
+                }
+                world.add(p);
+            }
+        }
+    }
+
+    /** Get the world list */
+    public List<Point> getListWorld() {
+        return world;
+    }
+
     /** Return the Point with given x and y coordinate */
+    @Override
     public Point getPoint(int x, int y) {
-        if (x < 0 || y < 0 || x >= World.WIDTH || y >= World.HEIGHT) {
+        if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
             return null;
         }
         return world.get(x * HEIGHT + y);
     }
 
+    @Override
+    public Point getPlayerPoint() {
+        int roomNum = getRandInt(0, rooms.size());
+        Room room = rooms.get(roomNum);
+        return getPoint(room.getCenter().x, room.getCenter().y);
+
+    }
+
+    @Override
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getHeight() {
+        return HEIGHT;
+    }
+
     /** Return a random integer by uniform
      * @param lb lower bound
      * @param up upper bound */
+    @Override
     public int getRandInt(int lb, int up) {
         return RandomUtils.uniform(random, lb, up);
     }

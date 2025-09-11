@@ -36,7 +36,6 @@ public class Room {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Point p = world.getPoint(start.x + i, start.y + j);
-                p.inRoom = true;
                 if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
                     p.setTile(Tileset.WALL);
                 } else {

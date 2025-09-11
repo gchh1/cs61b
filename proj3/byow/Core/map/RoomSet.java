@@ -9,17 +9,14 @@ import java.util.List;
 /** Weighted union disjoint sets that contain room */
 
 public class RoomSet extends WeightedUnionDS<Room> {
-    /** The world instance */
-    World world;
     /** The rooms list */
     List<Room> rooms;
 
 
 
     /** Add a room list */
-    public RoomSet(List<Room> rooms, World w) {
+    public RoomSet(List<Room> rooms) {
         super();
-        world = w;
         this.rooms = rooms;
         for (Room item : rooms) {
             add(item);
@@ -28,7 +25,7 @@ public class RoomSet extends WeightedUnionDS<Room> {
     }
 
     /** Connect all rooms */
-    public void connectRooms() {
+    public void connectRooms(WorldPrivilege wp) {
         List<Edge> edges = new ArrayList<>();
 
         for (int i = 0; i < rooms.size(); i++) {
@@ -47,15 +44,15 @@ public class RoomSet extends WeightedUnionDS<Room> {
         for (Edge e : edges) {
             if (!isConnected(e.r1, e.r2)) {
                 connect(e.r1, e.r2);
-                genPath(e.r1, e.r2);
+                genPath(e.r1, e.r2, wp);
             }
         }
     }
 
     /** Generate a path from a room to the other room */
-    private void genPath(Room r1, Room r2) {
-        Path path = new Path(world);
-        path.genPath(r1, r2);
+    private void genPath(Room r1, Room r2, WorldPrivilege wp) {
+        Path path = new Path();
+        path.genPath(r1, r2, wp);
     }
 
     /** Calculate the Manhattan distance of two rooms */

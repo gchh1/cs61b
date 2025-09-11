@@ -1,5 +1,7 @@
 package byow.Core;
 
+import byow.Core.map.World;
+import byow.Core.player.Player;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
@@ -38,7 +40,6 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
         // passed in as an argument, and return a 2D tile representation of the
         // world that would have been drawn if the same inputs had been given
         // to interactWithKeyboard().
@@ -46,7 +47,35 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
-        TETile[][] finalWorldFrame = null;
-        return finalWorldFrame;
+        GameState gs = new GameState();
+        World world;
+
+        input = Utils.splitInput(input);
+        if (input.contains("l")) {
+            // Load game
+            gs = Utils.loadGame();
+            world = new World(gs.getWorld(), gs.getSeed());
+            input = input.substring(1);
+        } else {
+            // Create a new game
+            int end = input.indexOf('s');
+            long seed = Long.parseLong(input.substring(0, end));
+            world = new World(WIDTH, HEIGHT, seed);
+            gs.resetState(world, new Player(world), seed);
+
+            input = input.substring(end + 1);
+        }
+
+
+        ter.initialize(WIDTH, HEIGHT);
+        Player player = gs.getPlayer();
+        player.setPlayer(world);
+        player.move(input, world);
+
+        if (input.contains(":")) {
+            Utils.saveGame(gs);
+        }
+        ter.renderFrame(world.getWorld());
+        return gs.getWorld();
     }
 }
