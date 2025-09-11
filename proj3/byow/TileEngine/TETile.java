@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
 import edu.princeton.cs.introcs.StdDraw;
 import byow.Core.RandomUtils;
 
