@@ -14,7 +14,7 @@ public class Utils {
     /** The current working directory */
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The world saving */
-    public static final File GAME = join(CWD, "game");
+    public static final File GAME = join(CWD, "game.txt");
 
     /* OTHER FILE UTILITIES */
 
@@ -161,7 +161,7 @@ public class Utils {
     }
 
     /** splitInput helper method */
-    private static boolean inMove(String c) {
+    public static boolean inMove(String c) {
         String map = "WwAaSsDd";
         return map.contains(c);
     }

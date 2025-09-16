@@ -1,9 +1,11 @@
 package byow.Core;
 
+import byow.Core.HUD.HUD;
 import byow.Core.map.World;
 import byow.Core.player.Player;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -15,7 +17,94 @@ public class Engine {
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
+
     public void interactWithKeyboard() {
+        GameState gs = new GameState();
+        World world = null;
+        Player player = null;
+        long seed = 0;
+        boolean enteringSeed = false;
+        boolean gameRunning = false;
+        boolean firstRunGame = true;
+        boolean awaitingQuit = false;
+
+        HUD.drawWelcome(800, 600);
+
+
+        while (true) {
+            // ---- 处理输入 ----
+            if (StdDraw.hasNextKeyTyped()) {
+                char input = Character.toLowerCase(StdDraw.nextKeyTyped());
+
+                if (!gameRunning) {
+                    // 菜单逻辑
+                    if (!enteringSeed && input == 'l') {
+                        // Load
+                        gs = Utils.loadGame();
+                        world = new World(gs.getWorld(), gs.getSeed());
+                        player = gs.getPlayer();
+                        player.setPlayer(world);
+                        gameRunning = true;
+
+                    } else if (!enteringSeed && input == 'n') {
+                        // New game
+                        enteringSeed = true;
+
+                    } else if (enteringSeed && Character.isDigit(input)) {
+                        // 输入种子
+                        seed = seed * 10 + (input - '0');
+
+                    } else if (enteringSeed && input == 's') {
+                        // 完成种子输入
+                        enteringSeed = false;
+                        gameRunning = true;
+                        world = new World(WIDTH, HEIGHT, seed);
+                        gs.resetState(world, new Player(world), seed);
+                        player = gs.getPlayer();
+                        player.setPlayer(world);
+                    }
+
+                }
+                if (gameRunning) {
+                    if (firstRunGame) {
+                        StdDraw.clear();
+                        ter.initialize(WIDTH, HEIGHT + 2); // +2 留HUD空间
+                        ter.renderFrame(world.getWorld());
+                        HUD.drawGameHUB(world.getWorld());
+                        StdDraw.show();
+                        firstRunGame = false;
+                    }
+                    // ---- 游戏运行逻辑 ----
+                    if (input == ':') {
+                        awaitingQuit = true;
+                    } else if (awaitingQuit && input == 'q') {
+                        Utils.saveGame(gs);
+                        break; // 退出
+                    } else {
+                        awaitingQuit = false;
+                        // 玩家移动
+                        if (Utils.inMove(String.valueOf(input))) {
+                            player.move(String.valueOf(input), world);
+                        }
+                    }
+                }
+            }
+
+            // ---- 渲染 ----
+            if (world != null) {
+                ter.renderFrame(world.getWorld());
+                HUD.drawGameHUB(world.getWorld()); // HUD 同时显示鼠标tile + 玩家信息
+                StdDraw.show();
+                StdDraw.pause(20);
+            }
+        }
+
+        System.exit(0);
+    }
+
+    /** Check if a character is numerate */
+    private boolean isNum(char c) {
+        return c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9';
     }
 
     /**
