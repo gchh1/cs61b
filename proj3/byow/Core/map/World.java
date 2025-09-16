@@ -118,6 +118,9 @@ public class World implements WorldPrivilege {
         return world;
     }
 
+    /** ===================== world privilege methods ============================== */
+
+
     /** Return the Point with given x and y coordinate */
     @Override
     public Point getPoint(int x, int y) {

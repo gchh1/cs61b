@@ -3,9 +3,13 @@ package byow.Core;
 import byow.Core.HUD.HUD;
 import byow.Core.map.World;
 import byow.Core.player.Player;
+import byow.Networking.BYOWClient;
+import byow.Networking.BYOWServer;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import edu.princeton.cs.introcs.StdDraw;
+
+import java.io.IOException;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -166,5 +170,85 @@ public class Engine {
         }
 //        ter.renderFrame(world.getWorld());
         return gs.getWorld();
+    }
+
+    /** Network part */
+    public void interactWithRemoteClient(String portString) throws IOException {
+        int port = Integer.parseInt(portString);
+        BYOWServer server = new BYOWServer(port);
+
+        GameState gs = new GameState();
+        World world = null;
+        Player player = null;
+        long seed = 0;
+        boolean enteringSeed = false;
+        boolean gameRunning = false;
+        boolean awaitingQuit = false;
+
+        HUD.drawWelcome(800, 600);
+        server.sendCanvasConfig(800, 600);
+        server.sendCanvas();
+
+        ter.initialize(WIDTH, HEIGHT + 2);
+        server.sendCanvasConfig(WIDTH * 16, (HEIGHT + 2) * 16);
+
+        while (true) {
+            // ---- 输入 ----
+            if (server.clientHasKeyTyped()) {
+                char input = Character.toLowerCase(server.clientNextKeyTyped());
+
+                if (!gameRunning) {
+                    // 菜单逻辑
+                    if (!enteringSeed && input == 'l') {
+                        gs = Utils.loadGame();
+                        world = new World(gs.getWorld(), gs.getSeed());
+                        player = gs.getPlayer();
+                        player.setPlayer(world);
+                        gameRunning = true;
+
+                    } else if (!enteringSeed && input == 'n') {
+                        enteringSeed = true;
+
+                    } else if (enteringSeed && Character.isDigit(input)) {
+                        seed = seed * 10 + (input - '0');
+
+                    } else if (enteringSeed && input == 's') {
+                        enteringSeed = false;
+                        gameRunning = true;
+                        world = new World(WIDTH, HEIGHT, seed);
+                        gs.resetState(world, new Player(world), seed);
+                        player = gs.getPlayer();
+                        player.setPlayer(world);
+                    }
+
+                } else {
+                    // 游戏逻辑
+                    if (input == ':') {
+                        awaitingQuit = true;
+                    } else if (awaitingQuit && input == 'q') {
+                        Utils.saveGame(gs);
+                        break; // 退出循环
+                    } else {
+                        awaitingQuit = false;
+                        if (Utils.inMove(String.valueOf(input))) {
+                            player.move(String.valueOf(input), world);
+                        }
+                    }
+                }
+            }
+
+            // ---- 渲染 ----
+            if (world != null) {
+                ter.renderFrame(world.getWorld());
+                HUD.drawGameHUB(world.getWorld());
+                StdDraw.show();
+                server.sendCanvas(); // ⚠️ 每次渲染都要同步到客户端
+            }
+
+            StdDraw.pause(20);
+        }
+
+        // ---- 退出前清理 ----
+        server.stopConnection();
     }
 }
